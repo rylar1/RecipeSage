@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ChefHat, Loader2 } from 'lucide-react';
@@ -32,10 +33,11 @@ const isRTL = (text: string) => {
 };
 
 export default function RecipeSagePage() {
-  const [generatedRecipe, setGeneratedRecipe] = useState<GenerateRecipeOutput | null>(null);
+  const [generatedRecipes, setGeneratedRecipes] = useState<GenerateRecipeOutput[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recipeDirection, setRecipeDirection] = useState<'ltr' | 'rtl'>('ltr');
+  const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
   const form = useForm<IngredientsFormValues>({
     resolver: zodResolver(formSchema),
@@ -47,18 +49,26 @@ export default function RecipeSagePage() {
   async function onSubmit(values: IngredientsFormValues) {
     setIsLoading(true);
     setError(null);
-    setGeneratedRecipe(null);
 
     // Detect text direction
     const direction = isRTL(values.ingredients) ? 'rtl' : 'ltr';
     setRecipeDirection(direction);
 
     try {
-      const result = await generateRecipe({ ingredients: values.ingredients });
-      setGeneratedRecipe(result);
+      // The generateRecipe function now returns an array of recipes
+      const newRecipes = await generateRecipe({ ingredients: values.ingredients });
+      setGeneratedRecipes(prevRecipes => [...prevRecipes, ...newRecipes]);
+      // Set the active tab to the first of the newly generated recipes
+      if (newRecipes.length > 0) {
+        setActiveTab(newRecipes[0].recipeName);
+      } else if (generatedRecipes.length === 0 && newRecipes.length > 0) {
+        // If this is the first set of recipes, set the first one as active.
+        setActiveTab(newRecipes[0].recipeName);
+      }
+
     } catch (e) {
       console.error(e);
-      setError('Failed to generate recipe. Please try again.');
+      setError('Failed to generate recipes. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +97,7 @@ export default function RecipeSagePage() {
         <CardHeader>
           <CardTitle className="text-2xl md:text-3xl text-center text-primary">What's in your kitchen?</CardTitle>
           <CardDescription className="text-center mt-1 bg-primary/20 text-primary-foreground p-3 rounded-lg">
-            Enter the ingredients you have, and let AI craft a recipe for you!
+            Enter the ingredients you have, and let AI craft recipes for you!
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,10 +130,10 @@ export default function RecipeSagePage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Generating Recipe...
+                      Generating Recipes...
                     </>
                   ) : (
-                    "Find Recipe"
+                    "Find Recipes"
                   )}
                 </Button>
               </div>
@@ -140,58 +150,75 @@ export default function RecipeSagePage() {
         </Alert>
       )}
 
-      {generatedRecipe && (
-        <Card 
-          className="mt-10 w-full max-w-2xl shadow-xl rounded-lg"
-          dir={recipeDirection} // Apply text direction here
+      {generatedRecipes.length > 0 && (
+        <Tabs 
+          value={activeTab} 
+          onValueChange={setActiveTab} 
+          className="mt-10 w-full max-w-2xl"
         >
-          <CardHeader>
-            <CardTitle className="text-2xl md:text-3xl text-primary">{generatedRecipe.recipeName}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2 text-foreground/90">Ingredients Used:</h3>
-              <ul className="list-disc list-inside pl-5 space-y-1 text-muted-foreground">
-                {generatedRecipe.ingredientsUsed.split(/,|\\n/).map((ing, index) => ing.trim() && (
-                  <li key={index}>{ing.trim()}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2 text-foreground/90">Instructions:</h3>
-              <div 
-                className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            {generatedRecipes.map((recipe) => (
+              <TabsTrigger key={recipe.recipeName} value={recipe.recipeName} className="truncate">
+                {recipe.recipeName}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {generatedRecipes.map((recipe) => (
+            <TabsContent key={recipe.recipeName} value={recipe.recipeName}>
+              <Card 
+                className="shadow-xl rounded-lg"
+                dir={recipeDirection} // Apply text direction here
               >
-                {generatedRecipe.instructions.split('\\n').map((line, index) => (
-                  <p key={index} className="mb-2">{line}</p>
-                ))}
-              </div>
-            </div>
-            {generatedRecipe.nutritionInfo && (
-              <div>
-                <h3 className="text-xl font-semibold mb-2 text-foreground/90">Nutritional Information (Estimated):</h3>
-                <div 
-                  className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
-                >
-                  {/* Assuming nutritionInfo is a string with newlines for formatting */}
-                  {generatedRecipe.nutritionInfo.split('\\n').map((line, index) => (
-                    <p key={index} className="mb-1">{line}</p>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  * Nutritional information is estimated by AI and may not be accurate. Always consult a professional for precise dietary information.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl md:text-3xl text-primary">{recipe.recipeName}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground/90">Ingredients Used:</h3>
+                    <ul className="list-disc list-inside pl-5 space-y-1 text-muted-foreground">
+                      {recipe.ingredientsUsed.split(/,|\\n/).map((ing, index) => ing.trim() && (
+                        <li key={index}>{ing.trim()}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-foreground/90">Instructions:</h3>
+                    <div 
+                      className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
+                    >
+                      {recipe.instructions.split('\\n').map((line, index) => (
+                        <p key={index} className="mb-2">{line}</p>
+                      ))}
+                    </div>
+                  </div>
+                  {recipe.nutritionInfo && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2 text-foreground/90">Nutritional Information (Estimated):</h3>
+                      <div 
+                        className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
+                      >
+                        {/* Assuming nutritionInfo is a string with newlines for formatting */}
+                        {recipe.nutritionInfo.split('\\n').map((line, index) => (
+                          <p key={index} className="mb-1">{line}</p>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        * Nutritional information is estimated by AI and may not be accurate. Always consult a professional for precise dietary information.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
       )}
 
-      {!isLoading && !generatedRecipe && !error && (
+      {!isLoading && generatedRecipes.length === 0 && !error && (
          <div className="mt-10 text-center text-muted-foreground w-full max-w-2xl p-8 md:p-12 border-2 border-dashed border-muted rounded-lg bg-card">
             <ChefHat size={56} className="mx-auto mb-6 text-primary/70" />
             <h3 className="text-xl font-semibold mb-2">Ready for a culinary adventure?</h3>
-            <p className="text-md">Enter your ingredients above, and we'll whip up a recipe for you!</p>
+            <p className="text-md">Enter your ingredients above, and we'll whip up some recipes for you!</p>
          </div>
       )}
       
