@@ -156,9 +156,9 @@ export default function RecipeSagePage() {
           onValueChange={setActiveTab} 
           className="mt-10 w-full max-w-2xl"
         >
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          <TabsList className="flex w-full overflow-x-auto gap-2 pb-2">
             {generatedRecipes.map((recipe) => (
-              <TabsTrigger key={recipe.recipeName} value={recipe.recipeName} className="truncate">
+              <TabsTrigger key={recipe.recipeName} value={recipe.recipeName} className="truncate flex-shrink-0">
                 {recipe.recipeName}
               </TabsTrigger>
             ))}
@@ -166,7 +166,7 @@ export default function RecipeSagePage() {
           {generatedRecipes.map((recipe) => (
             <TabsContent key={recipe.recipeName} value={recipe.recipeName}>
               <Card 
-                className="shadow-xl rounded-lg"
+                className="shadow-xl rounded-lg mt-2"
                 dir={recipeDirection} // Apply text direction here
               >
                 <CardHeader>
