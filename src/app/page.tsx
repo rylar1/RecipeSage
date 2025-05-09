@@ -27,7 +27,7 @@ type IngredientsFormValues = z.infer<typeof formSchema>;
 
 // Helper function to detect RTL text
 const isRTL = (text: string) => {
-  const rtlRegex = /[֑-߿יִ-﷽ﹰ-ﻼ]/;
+  const rtlRegex = /[\u0591-\u07FF\uFB1D-\uFB4F\uFE70-\uFEFC]/;
   return rtlRegex.test(text);
 };
 
@@ -159,7 +159,6 @@ export default function RecipeSagePage() {
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-2 text-foreground/90">Instructions:</h3>
-              {/* Ensure text alignment respects direction for instructions */}
               <div 
                 className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
               >
@@ -168,6 +167,22 @@ export default function RecipeSagePage() {
                 ))}
               </div>
             </div>
+            {generatedRecipe.nutritionInfo && (
+              <div>
+                <h3 className="text-xl font-semibold mb-2 text-foreground/90">Nutritional Information (Estimated):</h3>
+                <div 
+                  className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
+                >
+                  {/* Assuming nutritionInfo is a string with newlines for formatting */}
+                  {generatedRecipe.nutritionInfo.split('\\n').map((line, index) => (
+                    <p key={index} className="mb-1">{line}</p>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  * Nutritional information is estimated by AI and may not be accurate. Always consult a professional for precise dietary information.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
