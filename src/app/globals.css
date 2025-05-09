@@ -3,30 +3,30 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --background: 26 33% 87%; /* Warm Beige #E3D5CA */
+    --foreground: 136 29% 15%; /* Dark Earthy Green */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 136 29% 15%; /* Dark Earthy Green */
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 136 29% 15%; /* Dark Earthy Green */
+    --primary: 29 67% 44%; /* Burnt Orange #BC6C25 */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 27 17% 70%; /* Lighter Soft Brown */
+    --secondary-foreground: 136 29% 15%; /* Dark Earthy Green */
+    --muted: 27 17% 80%; /* Lighter Soft Brown for muted backgrounds */
+    --muted-foreground: 136 29% 25%; /* Mid Earthy Green for text on muted */
+    --accent: 27 17% 56%; /* Soft Brown #A38B76 */
+    --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --border: 27 17% 75%; /* Shade of Soft Brown */
+    --input: 27 17% 75%; /* Shade of Soft Brown */
+    --ring: 29 67% 44%; /* Burnt Orange */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -43,25 +43,25 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 136 29% 10%; /* Very Dark Earthy Green */
+    --foreground: 26 33% 87%; /* Warm Beige */
+    --card: 136 29% 15%; /* Dark Earthy Green (slightly lighter than bg) */
+    --card-foreground: 26 33% 87%; /* Warm Beige */
+    --popover: 136 29% 10%; /* Very Dark Earthy Green */
+    --popover-foreground: 26 33% 87%; /* Warm Beige */
+    --primary: 29 67% 50%; /* Slightly Lighter Burnt Orange */
+    --primary-foreground: 136 29% 5%; /* Very Dark Earthy Green for text on primary */
+    --secondary: 27 17% 25%; /* Dark Soft Brown */
+    --secondary-foreground: 26 33% 87%; /* Warm Beige */
+    --muted: 27 17% 20%; /* Darker Soft Brown */
+    --muted-foreground: 26 33% 75%; /* Lighter Warm Beige */
+    --accent: 27 17% 40%; /* Mid Soft Brown */
+    --accent-foreground: 26 33% 95%; /* Very Light Warm Beige */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 27 17% 30%; /* Dark Soft Brown */
+    --input: 27 17% 30%; /* Dark Soft Brown */
+    --ring: 29 67% 50%; /* Slightly Lighter Burnt Orange */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
