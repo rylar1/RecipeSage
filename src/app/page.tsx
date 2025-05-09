@@ -2,11 +2,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ChefHat, Zap } from 'lucide-react';
+import { ChefHat, Zap, LogIn, LogOut } from 'lucide-react'; // Added LogIn, LogOut
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '@/context/auth-context'; // Import useAuth
+import SignOutButton from '@/components/signout-button';
 
 export default function LandingPage() {
+  const { currentUser, loading } = useAuth(); // Get auth state
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 text-white">
       {/* Header */}
@@ -16,13 +20,23 @@ export default function LandingPage() {
             <ChefHat size={36} className="text-white" />
             <h1 className="text-3xl font-bold">RecipeSage</h1>
           </div>
-          <nav className="space-x-4">
+          <nav className="space-x-4 flex items-center">
             <Link href="/generate" passHref>
               <Button variant="ghost" className="text-lg hover:bg-white/20">
                 Generate Recipes
               </Button>
             </Link>
-            {/* Add other navigation links here if needed */}
+            {!loading && currentUser ? (
+              <SignOutButton />
+            ) : !loading ? (
+              <Link href="/signin" passHref>
+                <Button variant="outline" className="text-lg bg-transparent hover:bg-white/20">
+                  <LogIn className="mr-2 h-5 w-5" /> Sign In
+                </Button>
+              </Link>
+            ) : (
+              <div className="h-10 w-24 rounded-md bg-white/20 animate-pulse"></div> // Loading Skeleton
+            )}
           </nav>
         </div>
       </header>
@@ -38,6 +52,9 @@ export default function LandingPage() {
         <p className="text-xl md:text-2xl text-white/80 mb-10 max-w-3xl">
           Got a handful of ingredients? Don't know what to cook? RecipeSage instantly crafts delicious recipes tailored to what you have in your kitchen. Say goodbye to food waste and hello to new culinary adventures!
         </p>
+        {!loading && currentUser && (
+          <p className="text-2xl mb-6">Welcome back, {currentUser.email}!</p>
+        )}
         <Link href="/generate" passHref>
           <Button 
             size="lg" 

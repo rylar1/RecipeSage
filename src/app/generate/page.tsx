@@ -15,6 +15,9 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import withAuth from '@/components/withAuth'; // Import the HOC
+import SignOutButton from '@/components/signout-button'; // Import SignOutButton
+import { useAuth } from '@/context/auth-context'; // Import useAuth
 
 const formSchema = z.object({
   ingredients: z.string().min(3, {
@@ -32,7 +35,8 @@ const isRTL = (text: string) => {
   return rtlRegex.test(text);
 };
 
-export default function RecipeGenerationPage() { // Renamed component
+function RecipeGenerationPage() {
+  const { currentUser } = useAuth(); // Get current user
   const [generatedRecipes, setGeneratedRecipes] = useState<GenerateRecipeOutput[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,19 +54,15 @@ export default function RecipeGenerationPage() { // Renamed component
     setIsLoading(true);
     setError(null);
 
-    // Detect text direction
     const direction = isRTL(values.ingredients) ? 'rtl' : 'ltr';
     setRecipeDirection(direction);
 
     try {
-      // The generateRecipe function now returns an array of recipes
       const newRecipes = await generateRecipe({ ingredients: values.ingredients });
       setGeneratedRecipes(prevRecipes => [...prevRecipes, ...newRecipes]);
-      // Set the active tab to the first of the newly generated recipes
       if (newRecipes.length > 0) {
         setActiveTab(newRecipes[0].recipeName);
       } else if (generatedRecipes.length === 0 && newRecipes.length > 0) {
-        // If this is the first set of recipes, set the first one as active.
         setActiveTab(newRecipes[0].recipeName);
       }
 
@@ -76,12 +76,19 @@ export default function RecipeGenerationPage() { // Renamed component
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-8 md:py-12 flex flex-col items-center min-h-screen">
-      <header className="mb-10 text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-          <ChefHat className="h-12 w-12 text-primary" />
+      <header className="mb-10 text-center w-full">
+        <div className="flex justify-between items-center mb-4">
+          <div /> {/* Empty div for spacing */}
+          <div className="flex items-center">
+            <ChefHat className="h-12 w-12 text-primary" />
+            <h1 className="text-4xl md:text-5xl font-bold text-primary ml-2">RecipeSage</h1>
+          </div>
+          {currentUser && <SignOutButton />} {/* Add SignOutButton */}
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-primary">RecipeSage</h1>
         <p className="text-muted-foreground mt-2 text-lg md:text-xl">Your AI-powered culinary assistant</p>
+        {currentUser && (
+          <p className="text-md text-gray-600 mt-1">Signed in as: {currentUser.email}</p>
+        )}
       </header>
       
       <Image 
@@ -186,7 +193,7 @@ export default function RecipeGenerationPage() { // Renamed component
                     <div 
                       className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
                     >
-                      {recipe.instructions.split('\\n').map((line, index) => (
+                      {recipe.instructions.split('').map((line, index) => (
                         <p key={index} className="mb-2">{line}</p>
                       ))}
                     </div>
@@ -197,7 +204,6 @@ export default function RecipeGenerationPage() { // Renamed component
                       <div 
                         className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
                       >
-                        {/* Assuming nutritionInfo is a string with newlines for formatting */}
                         {recipe.nutritionInfo.split('\\n').map((line, index) => (
                           <p key={index} className="mb-1">{line}</p>
                         ))}
@@ -229,3 +235,5 @@ export default function RecipeGenerationPage() { // Renamed component
     </div>
   );
 }
+
+export default withAuth(RecipeGenerationPage); // Wrap the component with the HOC
