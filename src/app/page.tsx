@@ -104,16 +104,18 @@ export default function RecipeSagePage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full py-3 text-lg rounded-md" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Generating Recipe...
-                  </>
-                ) : (
-                  "Find Recipe"
-                )}
-              </Button>
+              <div className="flex justify-center">
+                <Button type="submit" className="py-3 text-lg rounded-md" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Generating Recipe...
+                    </>
+                  ) : (
+                    "Find Recipe"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
