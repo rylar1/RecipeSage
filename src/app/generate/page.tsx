@@ -85,7 +85,7 @@ function RecipeGenerationPage() {
           </div>
           {currentUser && <SignOutButton />} {/* Add SignOutButton */}
         </div>
-        <p className="text-muted-foreground mt-2 text-lg md:text-xl">Your AI-powered culinary assistant</p>
+        <p className="text-muted-foreground mt-2 text-lg md:text-xl">Your AI-powered culinary assistant From Red1</p>
         {currentUser && (
           <p className="text-md text-gray-600 mt-1">Signed in as: {currentUser.email}</p>
         )}
