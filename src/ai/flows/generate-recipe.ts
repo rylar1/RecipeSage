@@ -15,7 +15,7 @@ import {z} from 'genkit';
 const GenerateRecipeInputSchema = z.object({
   ingredients: z
     .string()
-    .describe('A comma-separated list of ingredients available for the recipe.'),
+    .describe('A comma-separated list of ingredients available for the recipe. This can be in any language.'),
 });
 
 export type GenerateRecipeInput = z.infer<typeof GenerateRecipeInputSchema>;
@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   name: 'generateRecipePrompt',
   input: {schema: GenerateRecipeInputSchema},
   output: {schema: GenerateRecipeOutputSchema},
-  prompt: `Given the following ingredients: {{{ingredients}}}, generate a recipe with step-by-step instructions. The response should include a recipe name, the ingredients used in this recipe, and clear, easy-to-follow instructions.
+  prompt: `Given the following ingredients: {{{ingredients}}}. First, detect the language of the ingredients. Then, generate a recipe with step-by-step instructions. The response, including the recipe name, the ingredients used, and the instructions, MUST be in the same language as the input ingredients.
 `,
 });
 
