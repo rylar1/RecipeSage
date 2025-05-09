@@ -1,22 +1,33 @@
 'use client'
 import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, UserCredential } from 'firebase/auth'; // Import UserCredential
 import { auth } from '@/lib/firebase';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
+import { saveUserToFirestore } from '@/lib/user-service'; // Import the service
 
 export default function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log('Signed up successfully!');
-      router.push('/generate'); // Redirect to /generate
+      
+      // Save user to Firestore
+      if (userCredential.user) {
+        await saveUserToFirestore({
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          // Add other details like displayName if you collect them
+        });
+      }
+      
+      router.push('/generate');
     } catch (err: any) {
       setError(err.message);
     }
