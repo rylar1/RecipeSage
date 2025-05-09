@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { GenerateRecipeOutput } from '@/ai/flows/generate-recipe';
@@ -74,7 +75,7 @@ export default function RecipeSagePage() {
       <Card className="w-full max-w-2xl shadow-xl rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl md:text-3xl text-center text-primary">What's in your kitchen?</CardTitle>
-          <CardDescription className="text-center text-muted-foreground mt-1">
+          <CardDescription className="text-center mt-1 bg-primary/20 text-primary-foreground p-3 rounded-lg">
             Enter the ingredients you have, and let AI craft a recipe for you!
           </CardDescription>
         </CardHeader>
