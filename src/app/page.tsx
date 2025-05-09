@@ -25,10 +25,17 @@ const formSchema = z.object({
 
 type IngredientsFormValues = z.infer<typeof formSchema>;
 
+// Helper function to detect RTL text
+const isRTL = (text: string) => {
+  const rtlRegex = /[֑-߿יִ-﷽ﹰ-ﻼ]/;
+  return rtlRegex.test(text);
+};
+
 export default function RecipeSagePage() {
   const [generatedRecipe, setGeneratedRecipe] = useState<GenerateRecipeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recipeDirection, setRecipeDirection] = useState<'ltr' | 'rtl'>('ltr');
 
   const form = useForm<IngredientsFormValues>({
     resolver: zodResolver(formSchema),
@@ -41,6 +48,10 @@ export default function RecipeSagePage() {
     setIsLoading(true);
     setError(null);
     setGeneratedRecipe(null);
+
+    // Detect text direction
+    const direction = isRTL(values.ingredients) ? 'rtl' : 'ltr';
+    setRecipeDirection(direction);
 
     try {
       const result = await generateRecipe({ ingredients: values.ingredients });
@@ -130,7 +141,10 @@ export default function RecipeSagePage() {
       )}
 
       {generatedRecipe && (
-        <Card className="mt-10 w-full max-w-2xl shadow-xl rounded-lg">
+        <Card 
+          className="mt-10 w-full max-w-2xl shadow-xl rounded-lg"
+          dir={recipeDirection} // Apply text direction here
+        >
           <CardHeader>
             <CardTitle className="text-2xl md:text-3xl text-primary">{generatedRecipe.recipeName}</CardTitle>
           </CardHeader>
@@ -138,15 +152,18 @@ export default function RecipeSagePage() {
             <div>
               <h3 className="text-xl font-semibold mb-2 text-foreground/90">Ingredients Used:</h3>
               <ul className="list-disc list-inside pl-5 space-y-1 text-muted-foreground">
-                {generatedRecipe.ingredientsUsed.split(/,|\n/).map((ing, index) => ing.trim() && (
+                {generatedRecipe.ingredientsUsed.split(/,|\\n/).map((ing, index) => ing.trim() && (
                   <li key={index}>{ing.trim()}</li>
                 ))}
               </ul>
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-2 text-foreground/90">Instructions:</h3>
-              <div className="prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line text-left">
-                {generatedRecipe.instructions.split('\n').map((line, index) => (
+              {/* Ensure text alignment respects direction for instructions */}
+              <div 
+                className={`prose prose-sm sm:prose-base max-w-none text-muted-foreground whitespace-pre-line ${recipeDirection === 'rtl' ? 'text-right' : 'text-left'}`}
+              >
+                {generatedRecipe.instructions.split('\\n').map((line, index) => (
                   <p key={index} className="mb-2">{line}</p>
                 ))}
               </div>

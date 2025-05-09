@@ -22,8 +22,8 @@ export type GenerateRecipeInput = z.infer<typeof GenerateRecipeInputSchema>;
 
 const GenerateRecipeOutputSchema = z.object({
   recipeName: z.string().describe('The name of the generated recipe.'),
-  instructions: z.string().describe('Step-by-step instructions for the recipe.'),
-  ingredientsUsed: z.string().describe('The ingredients used in this recipe'),
+  instructions: z.string().describe('Step-by-step instructions for the recipe, with each step being a complete sentence and separated by a newline character ().'),
+  ingredientsUsed: z.string().describe('A comma-separated string of the full names of the ingredients used in this recipe.'),
 });
 
 export type GenerateRecipeOutput = z.infer<typeof GenerateRecipeOutputSchema>;
@@ -36,7 +36,15 @@ const prompt = ai.definePrompt({
   name: 'generateRecipePrompt',
   input: {schema: GenerateRecipeInputSchema},
   output: {schema: GenerateRecipeOutputSchema},
-  prompt: `Given the following ingredients: {{{ingredients}}}. First, detect the language of the ingredients. Then, generate a recipe with step-by-step instructions. The response, including the recipe name, the ingredients used, and the instructions, MUST be in the same language as the input ingredients.
+  prompt: `Given the following ingredients: {{{ingredients}}}. 
+First, detect the language of the ingredients. 
+Then, generate a recipe.
+
+The response MUST be in the same language as the input ingredients and structured as follows:
+- recipeName: The name of the generated recipe.
+- ingredientsUsed: A comma-separated string of the full names of the ingredients used in this recipe.
+- instructions: A single string containing step-by-step instructions for the recipe. Each instruction step MUST be a complete sentence, and each step MUST be separated by a newline character (
+).
 `,
 });
 
